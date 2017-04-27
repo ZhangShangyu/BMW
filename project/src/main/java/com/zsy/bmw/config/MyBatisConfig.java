@@ -23,6 +23,11 @@ public class MyBatisConfig implements TransactionManagementConfigurer, Environme
 
     private Environment env;
 
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.env = environment;
+    }
+
     @Bean
     public DataSource dataSource() {
         DruidDataSource dataSource = new DruidDataSource();
@@ -39,6 +44,7 @@ public class MyBatisConfig implements TransactionManagementConfigurer, Environme
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setMapperLocations(applicationContext.getResources("classpath*:mapper/*.xml"));
+        sessionFactory.setTypeAliasesPackage(env.getProperty("mapper.model.package"));
         return sessionFactory;
     }
 
@@ -56,8 +62,4 @@ public class MyBatisConfig implements TransactionManagementConfigurer, Environme
         return new DataSourceTransactionManager(dataSource());
     }
 
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.env = environment;
-    }
 }
