@@ -15,4 +15,6 @@ public class Constant {
 
     public static String LOGIN_ERROR = "user name or password error";
 
+    public static String SAVE_FILE_ERROR = "save file error";
+
 }

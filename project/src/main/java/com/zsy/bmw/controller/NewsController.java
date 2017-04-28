@@ -6,7 +6,14 @@ import com.zsy.bmw.utils.Constant;
 import com.zsy.bmw.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by MAC on 27/04/2017.
@@ -23,5 +30,34 @@ public class NewsController {
         Result result = new Result(Constant.OK_CODE, Constant.OK);
         result.setData(newsService.getNewsByPage(news));
         return result;
+    }
+
+    @RequestMapping(value = "/upload")
+    public Result uploadPic(@RequestParam("file") MultipartFile uploadFile) {
+        if (uploadFile == null || uploadFile.isEmpty()) {
+            return new Result(Constant.ERROR_CODE1, Constant.PARAM_ERROR);
+        }
+        String fileUrl;
+        try {
+            fileUrl = saveUploadedFiles(uploadFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Result(Constant.ERROR_CODE2, Constant.SAVE_FILE_ERROR);
+        }
+        Result result = new Result(Constant.OK_CODE, Constant.OK);
+        result.setData(fileUrl);
+        return result;
+    }
+
+    //save file
+    private String saveUploadedFiles(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            return "";
+        }
+        byte[] bytes = file.getBytes();
+        Path path = Paths.get("/Users/mac/Desktop/BMW/project/src/main/resources/static/upload/" + file.getOriginalFilename());
+        Files.write(path, bytes);
+        return "http://localhost:8080/static/upload/" + file.getOriginalFilename();
+
     }
 }
