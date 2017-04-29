@@ -21,6 +21,15 @@ public class NewsService {
         return newsMapper.selectAll();
     }
 
+    public void insertNews(News news) {
+        newsMapper.insertNews(news);
+        newsMapper.insertContent(news);
+    }
+
+    public String getContent(Integer id) {
+        return newsMapper.getContent(id);
+    }
+
     private void executePagination(News news) {
         if (news.getPageNum() != null && news.getRows() != null) {
             PageHelper.startPage(news.getPageNum(), news.getRows());

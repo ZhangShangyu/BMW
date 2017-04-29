@@ -1,6 +1,7 @@
 package com.zsy.bmw.dao;
 
 import com.zsy.bmw.model.News;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -10,4 +11,10 @@ import java.util.List;
 public interface NewsMapper {
 
     List<News> selectAll();
+
+    String getContent(@Param("id") Integer id);
+
+    int insertNews(News news);
+
+    void insertContent(News news);
 }

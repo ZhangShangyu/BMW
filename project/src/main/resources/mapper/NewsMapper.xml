@@ -15,16 +15,40 @@
         <result column="content" property="content" jdbcType="VARCHAR"/>
     </resultMap>
 
-    <sql id="Base_Column_List">
-        id, creator_id, create_time, title, abstract, title_pic, content
+    <sql id="base_column_list">
+        id, creator_id, create_time, title, abstract, title_pic
     </sql>
 
+    <sql id="insert_column_list">
+        creator_id, title, abstract, title_pic
+    </sql>
 
     <select id="selectAll" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="base_column_list"/>
         from news
+        order by id desc
     </select>
 
+    <select id="getContent" parameterType="java.lang.Integer" resultType="java.lang.String">
+        SELECT
+        content
+        from news_content
+        where news_id = #{id}
+    </select>
+
+    <insert id="insertNews" parameterType="News" useGeneratedKeys="true" keyProperty="id">
+        insert into news
+        (<include refid="insert_column_list"/>)
+        values
+        (#{creatorId}, #{title}, #{newsAbstract}, #{titlePic})
+    </insert>
+
+    <insert id="insertContent" parameterType="News">
+        insert into news_content
+        (news_id, content)
+        values
+        (#{id}, #{content})
+    </insert>
 
 </mapper>
