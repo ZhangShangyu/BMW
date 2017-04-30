@@ -17,6 +17,7 @@ public class NewsService {
     private NewsMapper newsMapper;
 
     public List<News> getNewsByPage(News news) {
+        news.setRows(6);
         executePagination(news);
         return newsMapper.selectAll();
     }
