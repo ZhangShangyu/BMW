@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zsy.bmw.dao.HouseMapper">
+
+    <resultMap id="BaseResultMap" type="House">
+        <id column="house_id" property="houseId" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="creator_name" property="creatorName" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="price" property="price" jdbcType="FLOAT"/>
+        <result column="city_id" property="cityId" jdbcType="INTEGER"/>
+        <result column="region_id" property="regionId" jdbcType="INTEGER"/>
+        <result column="position" property="position" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="area" property="area" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="base_column_list">
+        id, creator_id, create_time, title, abstract, title_pic
+    </sql>
+
+
+    <select id="getTopHouses" resultMap="BaseResultMap">
+        select
+        house_id, name
+        from house
+        order by house_id desc
+    </select>
+
+
+    <select id="getHeadImg" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select
+        img
+        from house_imgs
+        where house_id = #{houseId}
+        limit 1
+    </select>
+
+
+</mapper>

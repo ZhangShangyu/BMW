@@ -3,8 +3,8 @@ package com.zsy.bmw.controller;
 import com.zsy.bmw.model.News;
 import com.zsy.bmw.service.NewsService;
 import com.zsy.bmw.utils.Constant;
-import com.zsy.bmw.utils.DateUtil;
 import com.zsy.bmw.utils.Result;
+import com.zsy.bmw.utils.UploadFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Created by MAC on 27/04/2017.
@@ -41,7 +38,7 @@ public class NewsController {
         }
         String fileUrl;
         try {
-            fileUrl = saveUploadedFiles(uploadFile);
+            fileUrl = UploadFileUtil.saveUploadedFiles(uploadFile);
         } catch (IOException e) {
             e.printStackTrace();
             return new Result(Constant.ERROR_CODE2, Constant.SAVE_FILE_ERROR);
@@ -74,14 +71,14 @@ public class NewsController {
     }
 
     //save file
-    private String saveUploadedFiles(MultipartFile file) throws IOException {
-        if (file.isEmpty()) {
-            return "";
-        }
-        byte[] bytes = file.getBytes();
-        String fileName = DateUtil.getNowTime() + "-" + file.getOriginalFilename();
-        Path path = Paths.get("/Users/mac/Desktop/BMW/project/src/main/resources/static/upload/" + fileName);
-        Files.write(path, bytes);
-        return "http://localhost:8080/static/upload/" + fileName;
-    }
+//    private String saveUploadedFiles(MultipartFile file) throws IOException {
+//        if (file.isEmpty()) {
+//            return "";
+//        }
+//        byte[] bytes = file.getBytes();
+//        String fileName = DateUtil.getNowTime() + "-" + file.getOriginalFilename();
+//        Path path = Paths.get("/Users/mac/Desktop/BMW/project/src/main/resources/static/upload/" + fileName);
+//        Files.write(path, bytes);
+//        return "http://localhost:8080/static/upload/" + fileName;
+//    }
 }
