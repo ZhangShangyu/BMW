@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 /**
- * Created by MAC on 27/04/2017.
+ * Created by ZSY on 27/04/2017.
  */
 @RestController
 @RequestMapping(value = "/news")
@@ -23,6 +23,8 @@ public class NewsController {
 
     @Autowired
     private NewsService newsService;
+    @Autowired
+    private UploadFileUtil uploadFileUtil;
 
     @RequestMapping(value = "/get")
     public Result getNews(News news) {
@@ -38,7 +40,7 @@ public class NewsController {
         }
         String fileUrl;
         try {
-            fileUrl = UploadFileUtil.saveUploadedFiles(uploadFile);
+            fileUrl = uploadFileUtil.saveUploadedFiles(uploadFile);
         } catch (IOException e) {
             e.printStackTrace();
             return new Result(Constant.ERROR_CODE2, Constant.SAVE_FILE_ERROR);
@@ -70,15 +72,4 @@ public class NewsController {
         return result;
     }
 
-    //save file
-//    private String saveUploadedFiles(MultipartFile file) throws IOException {
-//        if (file.isEmpty()) {
-//            return "";
-//        }
-//        byte[] bytes = file.getBytes();
-//        String fileName = DateUtil.getNowTime() + "-" + file.getOriginalFilename();
-//        Path path = Paths.get("/Users/mac/Desktop/BMW/project/src/main/resources/static/upload/" + fileName);
-//        Files.write(path, bytes);
-//        return "http://localhost:8080/static/upload/" + fileName;
-//    }
 }

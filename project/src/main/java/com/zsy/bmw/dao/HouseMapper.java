@@ -1,6 +1,7 @@
 package com.zsy.bmw.dao;
 
 import com.zsy.bmw.model.House;
+import com.zsy.bmw.model.HouseCondition;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -15,4 +16,21 @@ public interface HouseMapper {
 
     String getHeadImg(@Param("houseId") Integer houseId);
 
+    void insertHouse(House house);
+
+    void insertHouseImg(@Param("houseId") Integer houseId, @Param("imgUrl") String imgUrl);
+
+    void insertHouseTag(@Param("houseId") Integer houseId, @Param("tagId") Integer tag);
+
+    House getHouseById(@Param("houseId") Integer houseId);
+
+    House getHouseBriefById(@Param("houseId") Integer houseId);
+
+    List<String> getHouseImgs(@Param("houseId") Integer houseId);
+
+    List<Integer> getHouseTagIds(@Param("houseId") Integer houseId);
+
+    List<String> getTagNames(@Param("tagIds") List<Integer> tagIds);
+
+    List<Integer> getHouseIdsByCondition(HouseCondition condition);
 }

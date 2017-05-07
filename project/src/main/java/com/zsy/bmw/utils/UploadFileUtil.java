@@ -1,6 +1,7 @@
 package com.zsy.bmw.utils;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -11,15 +12,15 @@ import java.nio.file.Paths;
 /**
  * Created by ZSY on 29/04/2017.
  */
-
+@Component
 public class UploadFileUtil {
     @Value("${upload.path}")
-    private static String uploadPath;
+    private String uploadPath;
 
     @Value("${img.url}")
-    private static String imgUrl;
+    private String imgUrl;
 
-    public static String saveUploadedFiles(MultipartFile file) throws IOException {
+    public String saveUploadedFiles(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             return "";
         }
