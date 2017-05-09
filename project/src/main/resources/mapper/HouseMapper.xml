@@ -10,7 +10,7 @@
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="creator_name" property="creatorName" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="price" property="price" jdbcType="FLOAT"/>
+        <result column="price" property="price" jdbcType="INTEGER"/>
         <result column="city_id" property="cityId" jdbcType="INTEGER"/>
         <result column="region_id" property="regionId" jdbcType="INTEGER"/>
         <result column="position" property="position" jdbcType="VARCHAR"/>
@@ -19,6 +19,11 @@
         <result column="phone" property="phone" jdbcType="VARCHAR"/>
         <result column="contact" property="contact" jdbcType="VARCHAR"/>
         <result column="des" property="des" jdbcType="VARCHAR"/>
+        <result column="region_tag" property="regionTag" jdbcType="INTEGER"/>
+        <result column="type_tag" property="typeTag" jdbcType="INTEGER"/>
+        <result column="dec_tag" property="decTag" jdbcType="INTEGER"/>
+        <result column="route_tag" property="routeTag" jdbcType="INTEGER"/>
+        <result column="station_tag" property="stationTag" jdbcType="INTEGER"/>
     </resultMap>
 
 
@@ -73,19 +78,40 @@
         </foreach>
     </select>
 
-    <select id="getHouseIdsByCondition" parameterType="HouseCondition" resultType="java.lang.Integer">
-        SELECT name
-        from tag
-        where tag_id IN
-        <foreach item="id" collection="tagIds" open="(" separator="," close=")">
-            #{id}
-        </foreach>
+    <select id="getHouseIdsByCondition" parameterType="HouseCondition" resultMap="BaseResultMap">
+        SELECT house_id, name, price, position, area, des
+        FROM house where 1=1
+        <if test="price != null">
+            and price &lt;= #{maxPrice} and price &gt;= #{minPrice}
+        </if>
+        <if test="area != null">
+            and area &lt;= #{maxArea} and area &gt;= #{minArea}
+        </if>
+        <if test="region != null">
+            and region_tag = #{region}
+        </if>
+        <if test="type != null">
+            and type_tag = #{type}
+        </if>
+        <if test="dec != null">
+            and dec_tag = #{dec}
+        </if>
+        <if test="route != null">
+            and route_tag = #{route}
+        </if>
+        <if test="station != null">
+            and station_tag = #{station}
+        </if>
     </select>
 
     <insert id="insertHouse" parameterType="House" useGeneratedKeys="true" keyProperty="houseId">
         INSERT INTO
-        house(name, creator_name, price, city_id, position, area, phone, contact, des)
-        VALUES (#{name}, #{creatorName}, #{price}, #{cityId}, #{position}, #{area}, #{phone}, #{contact}, #{des})
+        house(name, creator_name, price, city_id,
+        position, area, phone, contact, des,
+        region_tag, type_tag, dec_tag, route_tag, station_tag)
+        VALUES (#{name}, #{creatorName}, #{price}, #{cityId},
+        #{position}, #{area}, #{phone}, #{contact}, #{des},
+        #{regionTag}, #{typeTag}, #{decTag}, #{routeTag}, #{stationTag})
     </insert>
 
     <insert id="insertHouseImg">

@@ -12,7 +12,7 @@ public class House extends BaseEntity {
     private String name;
     private String creatorName;
     private Date createTime;
-    private Float price;
+    private Integer price;
     private Integer cityId;
     private Integer regionId;
     private String position;
@@ -30,6 +30,51 @@ public class House extends BaseEntity {
 
     private List<String> tagNames;
 
+    private Integer regionTag;
+    private Integer typeTag;
+    private Integer decTag;
+    private Integer routeTag;
+    private Integer stationTag;
+
+    public Integer getRegionTag() {
+        return regionTag;
+    }
+
+    public void setRegionTag(Integer regionTag) {
+        this.regionTag = regionTag;
+    }
+
+    public Integer getTypeTag() {
+        return typeTag;
+    }
+
+    public void setTypeTag(Integer typeTag) {
+        this.typeTag = typeTag;
+    }
+
+    public Integer getDecTag() {
+        return decTag;
+    }
+
+    public void setDecTag(Integer decTag) {
+        this.decTag = decTag;
+    }
+
+    public Integer getRouteTag() {
+        return routeTag;
+    }
+
+    public void setRouteTag(Integer routeTag) {
+        this.routeTag = routeTag;
+    }
+
+    public Integer getStationTag() {
+        return stationTag;
+    }
+
+    public void setStationTag(Integer stationTag) {
+        this.stationTag = stationTag;
+    }
 
     public List<String> getImgUrls() {
         return imgUrls;
@@ -111,11 +156,11 @@ public class House extends BaseEntity {
         this.createTime = createTime;
     }
 
-    public Float getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(Float price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 

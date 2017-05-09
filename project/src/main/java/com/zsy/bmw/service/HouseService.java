@@ -7,7 +7,7 @@ import com.zsy.bmw.model.HouseCondition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,38 +31,51 @@ public class HouseService {
     }
 
     public void saveHouse(House house) {
+        // TODO 插入数据后插入solr索引 可考虑用异步队列
         houseMapper.insertHouse(house);
         for (String imgUrl : house.getImgUrls()) {
             houseMapper.insertHouseImg(house.getHouseId(), imgUrl);
         }
-        for (Integer tagId : house.getTagIds()) {
-            houseMapper.insertHouseTag(house.getHouseId(), tagId);
+        // TODO 考虑是否还需要TAG
+        Integer id = house.getHouseId();
+        houseMapper.insertHouseTag(id, house.getRegionTag());
+        houseMapper.insertHouseTag(id, house.getTypeTag());
+        houseMapper.insertHouseTag(id, house.getDecTag());
+        if (house.getRouteTag() != 0) {
+            houseMapper.insertHouseTag(id, house.getRouteTag());
+        }
+        if (house.getStationTag() != 0) {
+            houseMapper.insertHouseTag(id, house.getStationTag());
         }
     }
 
     public House getHouseDetail(Integer id) {
         House house = houseMapper.getHouseById(id);
         house.setImgUrls(houseMapper.getHouseImgs(id));
-        house.setTagNames(houseMapper.getTagNames(houseMapper.getHouseTagIds(id)));
+        List<Integer> tagIds = houseMapper.getHouseTagIds(id);
+        if (tagIds.size() != 0) {
+            house.setTagNames(houseMapper.getTagNames(tagIds));
+        } else {
+            house.setTagNames(Collections.emptyList());
+        }
         return house;
     }
 
     public List<House> getHouseByCondition(HouseCondition condition) {
+        // TODO  1、 改变condition格式  2 、使用solr搜索出id list  3 、拼装house info
         handleCondition(condition);
         executePagination(condition);
-        List<Integer> houseIds = houseMapper.getHouseIdsByCondition(condition);
-        List<House> result = new ArrayList<>();
-        for (Integer id : houseIds) {
-            result.add(getHouseBrief(id));
+        List<House> houses = houseMapper.getHouseIdsByCondition(condition);
+        for (House house : houses) {
+            house.setHeadImg(houseMapper.getHeadImg(house.getHouseId()));
+            List<Integer> tagIds = houseMapper.getHouseTagIds(house.getHouseId());
+            if (tagIds.size() != 0) {
+                house.setTagNames(houseMapper.getTagNames(tagIds));
+            } else {
+                house.setTagNames(Collections.emptyList());
+            }
         }
-        return result;
-    }
-
-    private House getHouseBrief(Integer id) {
-        House house = houseMapper.getHouseBriefById(id);
-        house.setHeadImg(houseMapper.getHeadImg(id));
-        house.setTagNames(houseMapper.getTagNames(houseMapper.getHouseTagIds(id)));
-        return house;
+        return houses;
     }
 
     private void handleCondition(HouseCondition condition) {
@@ -70,8 +83,8 @@ public class HouseService {
         if (price != null) {
             String minPrice = price.split("-")[0];
             String maxPrice = price.split("-")[1];
-            condition.setMinPrice(Float.parseFloat(minPrice));
-            condition.setMaxPrice(Float.parseFloat(maxPrice));
+            condition.setMinPrice(Integer.parseInt(minPrice));
+            condition.setMaxPrice(Integer.parseInt(maxPrice));
         }
         String area = condition.getArea();
         if (area != null) {
@@ -80,25 +93,7 @@ public class HouseService {
             condition.setMinArea(Integer.parseInt(minArea));
             condition.setMaxArea(Integer.parseInt(maxArea));
         }
-        List<Integer> tagIds = new ArrayList<>();
-        if (condition.getRegion() != null) {
-            tagIds.add(condition.getRegion());
-        }
-        if (condition.getType() != null) {
-            tagIds.add(condition.getType());
-        }
-        if (condition.getDec() != null) {
-            tagIds.add(condition.getDec());
-        }
-        if (condition.getRoute() != null) {
-            tagIds.add(condition.getRoute());
-        }
-        if (condition.getStation() != null) {
-            tagIds.add(condition.getStation());
-        }
-        if (tagIds.size() != 0) {
-            condition.setTagIds(tagIds);
-        }
+        condition.setRows(8);
     }
 
     private void executePagination(House house) {

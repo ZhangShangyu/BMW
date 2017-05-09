@@ -1,6 +1,5 @@
 package com.zsy.bmw.model;
 
-import java.util.List;
 
 /**
  * Created by ZSY on 08/05/2017.
@@ -15,12 +14,10 @@ public class HouseCondition extends BaseEntity {
     private String area;
     private String price;
 
-    private Float minPrice;
-    private Float maxPrice;
+    private Integer minPrice;
+    private Integer maxPrice;
     private Integer minArea;
     private Integer maxArea;
-
-    private List<Integer> tagIds;
 
     public Integer getRegion() {
         return region;
@@ -78,19 +75,19 @@ public class HouseCondition extends BaseEntity {
         this.price = price;
     }
 
-    public Float getMinPrice() {
+    public Integer getMinPrice() {
         return minPrice;
     }
 
-    public void setMinPrice(Float minPrice) {
+    public void setMinPrice(Integer minPrice) {
         this.minPrice = minPrice;
     }
 
-    public Float getMaxPrice() {
+    public Integer getMaxPrice() {
         return maxPrice;
     }
 
-    public void setMaxPrice(Float maxPrice) {
+    public void setMaxPrice(Integer maxPrice) {
         this.maxPrice = maxPrice;
     }
 
@@ -110,11 +107,4 @@ public class HouseCondition extends BaseEntity {
         this.maxArea = maxArea;
     }
 
-    public List<Integer> getTagIds() {
-        return tagIds;
-    }
-
-    public void setTagIds(List<Integer> tagIds) {
-        this.tagIds = tagIds;
-    }
 }

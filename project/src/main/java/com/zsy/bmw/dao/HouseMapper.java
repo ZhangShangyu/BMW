@@ -32,5 +32,5 @@ public interface HouseMapper {
 
     List<String> getTagNames(@Param("tagIds") List<Integer> tagIds);
 
-    List<Integer> getHouseIdsByCondition(HouseCondition condition);
+    List<House> getHouseIdsByCondition(HouseCondition condition);
 }

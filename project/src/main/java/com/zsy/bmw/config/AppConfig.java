@@ -1,6 +1,8 @@
 package com.zsy.bmw.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.context.ApplicationContext;
@@ -19,7 +21,7 @@ import javax.sql.DataSource;
  */
 
 @Configuration
-public class MyBatisConfig implements TransactionManagementConfigurer, EnvironmentAware {
+public class AppConfig implements TransactionManagementConfigurer, EnvironmentAware {
 
     private Environment env;
 
@@ -60,6 +62,11 @@ public class MyBatisConfig implements TransactionManagementConfigurer, Environme
     @Override
     public PlatformTransactionManager annotationDrivenTransactionManager() {
         return new DataSourceTransactionManager(dataSource());
+    }
+
+    @Bean
+    public SolrClient solrClient() {
+        return new HttpSolrClient(env.getProperty("solr.core.bmw"));
     }
 
 }

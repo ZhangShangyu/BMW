@@ -5,12 +5,18 @@ import com.zsy.bmw.model.HouseCondition;
 import com.zsy.bmw.service.HouseService;
 import com.zsy.bmw.utils.Constant;
 import com.zsy.bmw.utils.Result;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -53,6 +59,26 @@ public class HouseController {
         List<House> houses = houseService.getHouseByCondition(condition);
         Result result = new Result(Constant.OK_CODE, Constant.OK);
         result.setData(houses);
+        return result;
+    }
+
+    @Autowired
+    private SolrClient solrClient;
+
+    @RequestMapping("test")
+    public Result test() {
+        try {
+            QueryResponse resp = solrClient.query(new SolrQuery("*:*"));
+            SolrDocumentList list = resp.getResults();
+            System.out.print(list.get(1));
+
+        } catch (SolrServerException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Result result = new Result(Constant.OK_CODE, Constant.OK);
         return result;
     }
 }
