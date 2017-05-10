@@ -4,9 +4,17 @@ import com.github.pagehelper.PageHelper;
 import com.zsy.bmw.dao.HouseMapper;
 import com.zsy.bmw.model.House;
 import com.zsy.bmw.model.HouseCondition;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +26,9 @@ import java.util.List;
 public class HouseService {
     @Autowired
     private HouseMapper houseMapper;
+
+    @Autowired
+    private SolrClient solrClient;
 
     public List<House> getTopHouse() {
         House _house = new House();
@@ -62,20 +73,122 @@ public class HouseService {
     }
 
     public List<House> getHouseByCondition(HouseCondition condition) {
-        // TODO  1、 改变condition格式  2 、使用solr搜索出id list  3 、拼装house info
+        // TODO  无搜索条件的时候推送什么？
         handleCondition(condition);
-        executePagination(condition);
-        List<House> houses = houseMapper.getHouseIdsByCondition(condition);
-        for (House house : houses) {
-            house.setHeadImg(houseMapper.getHeadImg(house.getHouseId()));
-            List<Integer> tagIds = houseMapper.getHouseTagIds(house.getHouseId());
+        List<Integer> houseIds = getHouseIdBySolr(condition);
+        List<House> houses = new ArrayList<>();
+        for (Integer id : houseIds) {
+            House house = houseMapper.getHouseBriefById(id);
+            house.setHeadImg(houseMapper.getHeadImg(id));
+            List<Integer> tagIds = houseMapper.getHouseTagIds(id);
             if (tagIds.size() != 0) {
                 house.setTagNames(houseMapper.getTagNames(tagIds));
             } else {
                 house.setTagNames(Collections.emptyList());
             }
+            houses.add(house);
         }
         return houses;
+    }
+
+    private List<Integer> getHouseIdBySolr(HouseCondition condition) {
+        SolrQuery solrQuery = getQuery(condition);
+        if (solrQuery != null) try {
+            List<Integer> result = new ArrayList<>();
+            QueryResponse resp = solrClient.query(solrQuery);
+            SolrDocumentList list = resp.getResults();
+            for (SolrDocument solrDocument : list) {
+                result.add(Integer.parseInt((String) solrDocument.get("id")));
+            }
+            return result;
+        } catch (SolrServerException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
+    }
+
+    private SolrQuery getQuery(HouseCondition condition) {
+        String searchKey = getSearchKey(condition);
+        if (searchKey == null) {
+            return null;
+        }
+        SolrQuery solrQuery = new SolrQuery(searchKey);
+        solrQuery.set("fl", "id");
+        return solrQuery;
+    }
+
+    private String getSearchKey(HouseCondition condition) {
+        if (condition.getSearchKey() == null && condition.getPrice() == null
+                && condition.getArea() == null && condition.getDecLabel() == null
+                && condition.getRouteLabel() == null && condition.getStationLabel() == null
+                && condition.getRegionLabel() == null && condition.getTypeLabel() == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        Boolean needAnd = false;
+        if (condition.getSearchKey() != null) {
+            sb.append(condition.getSearchKey());
+            needAnd = true;
+        }
+        if (condition.getPrice() != null) {
+            String fieldQuery = "price:" + "[" + condition.getMinPrice() + " TO " + condition.getMaxPrice() + "]";
+            if (needAnd) {
+                sb.append(" AND ");
+            }
+            sb.append(fieldQuery);
+            needAnd = true;
+        }
+        if (condition.getArea() != null) {
+            String fieldQuery = "area:" + "[" + condition.getMinArea() + " TO " + condition.getMaxArea() + "]";
+            if (needAnd) {
+                sb.append(" AND ");
+            }
+            sb.append(fieldQuery);
+            needAnd = true;
+        }
+        if (condition.getDecLabel() != null) {
+            String fieldQuery = "dec:" + condition.getDecLabel();
+            if (needAnd) {
+                sb.append(" AND ");
+            }
+            sb.append(fieldQuery);
+            needAnd = true;
+        }
+        if (condition.getRouteLabel() != null) {
+            String fieldQuery = "route:" + condition.getRouteLabel();
+            if (needAnd) {
+                sb.append(" AND ");
+            }
+            sb.append(fieldQuery);
+            needAnd = true;
+        }
+        if (condition.getStationLabel() != null) {
+            String fieldQuery = "station:" + condition.getStationLabel();
+            if (needAnd) {
+                sb.append(" AND ");
+            }
+            sb.append(fieldQuery);
+            needAnd = true;
+        }
+        if (condition.getRegionLabel() != null) {
+            String fieldQuery = "region:" + condition.getRegionLabel();
+            if (needAnd) {
+                sb.append(" AND ");
+            }
+            sb.append(fieldQuery);
+            needAnd = true;
+        }
+        if (condition.getTypeLabel() != null) {
+            String fieldQuery = "type:" + condition.getTypeLabel();
+            if (needAnd) {
+                sb.append(" AND ");
+            }
+            sb.append(fieldQuery);
+        }
+        return sb.toString();
     }
 
     private void handleCondition(HouseCondition condition) {

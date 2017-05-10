@@ -19,6 +19,61 @@ public class HouseCondition extends BaseEntity {
     private Integer minArea;
     private Integer maxArea;
 
+    private String searchKey;
+    private String regionLabel;
+    private String typeLabel;
+    private String stationLabel;
+    private String routeLabel;
+    private String decLabel;
+
+    public String getRegionLabel() {
+        return regionLabel;
+    }
+
+    public void setRegionLabel(String regionLabel) {
+        this.regionLabel = regionLabel;
+    }
+
+    public String getTypeLabel() {
+        return typeLabel;
+    }
+
+    public void setTypeLabel(String typeLabel) {
+        this.typeLabel = typeLabel;
+    }
+
+    public String getStationLabel() {
+        return stationLabel;
+    }
+
+    public void setStationLabel(String stationLabel) {
+        this.stationLabel = stationLabel;
+    }
+
+    public String getRouteLabel() {
+        return routeLabel;
+    }
+
+    public void setRouteLabel(String routeLabel) {
+        this.routeLabel = routeLabel;
+    }
+
+    public String getDecLabel() {
+        return decLabel;
+    }
+
+    public void setDecLabel(String decLabel) {
+        this.decLabel = decLabel;
+    }
+
+    public String getSearchKey() {
+        return searchKey;
+    }
+
+    public void setSearchKey(String searchKey) {
+        this.searchKey = searchKey;
+    }
+
     public Integer getRegion() {
         return region;
     }
