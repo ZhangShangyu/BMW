@@ -104,6 +104,12 @@
         </if>
     </select>
 
+    <select id="getTagName" parameterType="java.lang.Integer" resultType="java.lang.String">
+        SELECT name
+        FROM tag
+        WHERE tag_id = #{id}
+    </select>
+
     <insert id="insertHouse" parameterType="House" useGeneratedKeys="true" keyProperty="houseId">
         INSERT INTO
         house(name, creator_name, price, city_id,

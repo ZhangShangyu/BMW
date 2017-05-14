@@ -33,4 +33,6 @@ public interface HouseMapper {
     List<String> getTagNames(@Param("tagIds") List<Integer> tagIds);
 
     List<House> getHouseIdsByCondition(HouseCondition condition);
+
+    String getTagName(@Param("id") Integer id);
 }

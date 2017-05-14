@@ -23,7 +23,6 @@ public class House extends BaseEntity {
 
     private List<String> imgUrls;
     private List<Integer> tagIds;
-    private String description;
     private String phone;
     private String contact;
     private String des;
@@ -90,14 +89,6 @@ public class House extends BaseEntity {
 
     public void setTagIds(List<Integer> tagIds) {
         this.tagIds = tagIds;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getPhone() {

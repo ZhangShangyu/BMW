@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +59,7 @@ public class HouseService {
         if (house.getStationTag() != 0) {
             houseMapper.insertHouseTag(id, house.getStationTag());
         }
+        saveSolrIndex(house);
     }
 
     public House getHouseDetail(Integer id) {
@@ -91,9 +93,35 @@ public class HouseService {
         return houses;
     }
 
+    private void saveSolrIndex(House house) {
+        SolrInputDocument document = new SolrInputDocument();
+        document.addField("id", house.getHouseId());
+        document.addField("name", house.getName());
+        document.addField("area", house.getArea());
+        document.addField("price", house.getPrice());
+        document.addField("des", house.getDes());
+        document.addField("region", houseMapper.getTagName(house.getRegionTag()));
+        document.addField("type", houseMapper.getTagName(house.getTypeTag()));
+        document.addField("dec", houseMapper.getTagName(house.getDecTag()));
+        if (house.getRouteTag() != 0) {
+            document.addField("route", houseMapper.getTagName(house.getRouteTag()));
+        }
+        if (house.getStationTag() != 0) {
+            document.addField("station", houseMapper.getTagName(house.getStationTag()));
+        }
+        try {
+            solrClient.add(document);
+            solrClient.commit();
+        } catch (SolrServerException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private List<Integer> getHouseIdBySolr(HouseCondition condition) {
         SolrQuery solrQuery = getQuery(condition);
-        if (solrQuery != null) try {
+        try {
             List<Integer> result = new ArrayList<>();
             QueryResponse resp = solrClient.query(solrQuery);
             SolrDocumentList list = resp.getResults();
@@ -113,9 +141,11 @@ public class HouseService {
     private SolrQuery getQuery(HouseCondition condition) {
         String searchKey = getSearchKey(condition);
         if (searchKey == null) {
-            return null;
+            searchKey = "*:*";
         }
         SolrQuery solrQuery = new SolrQuery(searchKey);
+        solrQuery.set("start", (condition.getPageNum() - 1) * condition.getRows());
+        solrQuery.set("rows", condition.getRows());
         solrQuery.set("fl", "id");
         return solrQuery;
     }
@@ -206,7 +236,7 @@ public class HouseService {
             condition.setMinArea(Integer.parseInt(minArea));
             condition.setMaxArea(Integer.parseInt(maxArea));
         }
-        condition.setRows(8);
+        condition.setRows(2);
     }
 
     private void executePagination(House house) {
@@ -215,9 +245,4 @@ public class HouseService {
         }
     }
 
-    private void executePagination(HouseCondition condition) {
-        if (condition.getPageNum() != null && condition.getRows() != null) {
-            PageHelper.startPage(condition.getPageNum(), condition.getRows());
-        }
-    }
 }
