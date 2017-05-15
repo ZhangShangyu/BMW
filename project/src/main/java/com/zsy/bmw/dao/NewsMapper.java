@@ -17,4 +17,6 @@ public interface NewsMapper {
     int insertNews(News news);
 
     void insertContent(News news);
+
+    List<News> getNewsByCreator(@Param("creatorName") String creatorName);
 }

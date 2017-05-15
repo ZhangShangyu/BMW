@@ -56,4 +56,12 @@ public class HouseController {
         return result;
     }
 
+    @RequestMapping("house-by-me")
+    public Result getHouseByCreator(@RequestParam("name") String creatorName) {
+        List<House> houses = houseService.getHouseByCreator(creatorName);
+        Result result = new Result(Constant.OK_CODE, Constant.OK);
+        result.setData(houses);
+        return result;
+    }
+
 }

@@ -31,6 +31,10 @@ public class HouseService {
     @Autowired
     private SolrClient solrClient;
 
+    public List<House> getHouseByCreator(String creatorName) {
+        return houseMapper.getHouseByCreator(creatorName);
+    }
+
     public List<House> getTopHouse() {
         House _house = new House();
         _house.setRows(18);

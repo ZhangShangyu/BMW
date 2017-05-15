@@ -16,6 +16,10 @@ public class NewsService {
     @Autowired
     private NewsMapper newsMapper;
 
+    public List<News> getNewsByCreator(String creatorName) {
+        return newsMapper.getNewsByCreator(creatorName);
+    }
+
     public List<News> getNewsByPage(News news) {
         news.setRows(6);
         executePagination(news);

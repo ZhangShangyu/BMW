@@ -1,14 +1,12 @@
 package com.zsy.bmw.model;
 
-import java.util.Date;
-
 /**
  * Created by MAC on 27/04/2017.
  */
 public class News extends BaseEntity {
     private Integer id;
-    private Integer creatorId;
-    private Date createTime;
+    private String creatorName;
+    private String createTime;
     private String title;
     private String newsAbstract;
     private String titlePic;
@@ -22,19 +20,11 @@ public class News extends BaseEntity {
         this.id = id;
     }
 
-    public Integer getCreatorId() {
-        return creatorId;
-    }
-
-    public void setCreatorId(Integer creatorId) {
-        this.creatorId = creatorId;
-    }
-
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
@@ -68,5 +58,13 @@ public class News extends BaseEntity {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getCreatorName() {
+        return creatorName;
+    }
+
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
     }
 }

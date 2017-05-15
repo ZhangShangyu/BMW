@@ -1,6 +1,5 @@
 package com.zsy.bmw.model;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -11,7 +10,7 @@ public class House extends BaseEntity {
     private Integer HouseId;
     private String name;
     private String creatorName;
-    private Date createTime;
+    private String createTime;
     private Integer price;
     private Integer cityId;
     private Integer regionId;
@@ -139,11 +138,11 @@ public class House extends BaseEntity {
         this.creatorName = creatorName;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 

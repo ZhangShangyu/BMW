@@ -7,7 +7,7 @@
 
     <resultMap id="BaseResultMap" type="News">
         <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="creator_id" property="creatorId" jdbcType="INTEGER"/>
+        <result column="creator_name" property="creatorName" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="title" property="title" jdbcType="VARCHAR"/>
         <result column="abstract" property="newsAbstract" jdbcType="VARCHAR"/>
@@ -16,11 +16,11 @@
     </resultMap>
 
     <sql id="base_column_list">
-        id, creator_id, create_time, title, abstract, title_pic
+        id, creator_name, create_time, title, abstract, title_pic
     </sql>
 
     <sql id="insert_column_list">
-        creator_id, title, abstract, title_pic
+        creator_name, title, abstract, title_pic
     </sql>
 
     <select id="selectAll" resultMap="BaseResultMap">
@@ -37,11 +37,18 @@
         where news_id = #{id}
     </select>
 
+    <select id="getNewsByCreator" resultMap="BaseResultMap">
+        SELECT
+        id, create_time, title
+        from news
+        where creator_name = #{creatorName}
+    </select>
+
     <insert id="insertNews" parameterType="News" useGeneratedKeys="true" keyProperty="id">
         insert into news
         (<include refid="insert_column_list"/>)
         values
-        (#{creatorId}, #{title}, #{newsAbstract}, #{titlePic})
+        (#{creatorName}, #{title}, #{newsAbstract}, #{titlePic})
     </insert>
 
     <insert id="insertContent" parameterType="News">

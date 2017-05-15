@@ -50,6 +50,13 @@
         limit 1
     </select>
 
+    <select id="getHouseByCreator" resultMap="BaseResultMap">
+        SELECT house_id, name, create_time, position, contact, phone
+        from house
+        where creator_name = #{creatorName}
+        order by create_time desc
+    </select>
+
     <select id="getHouseBriefById" resultMap="BaseResultMap">
         SELECT house_id, name, price, position, area, des
         from house

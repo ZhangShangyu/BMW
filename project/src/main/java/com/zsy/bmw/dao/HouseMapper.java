@@ -35,4 +35,6 @@ public interface HouseMapper {
     List<House> getHouseIdsByCondition(HouseCondition condition);
 
     String getTagName(@Param("id") Integer id);
+
+    List<House> getHouseByCreator(@Param("creatorName") String creatorName);
 }

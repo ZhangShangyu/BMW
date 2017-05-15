@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by ZSY on 27/04/2017.
@@ -52,7 +53,7 @@ public class NewsController {
 
     @RequestMapping(value = "/save")
     public Result saveNews(@RequestBody News news) {
-        if (news.getCreatorId() == null || news.getTitle() == null
+        if (news.getCreatorName() == null || news.getTitle() == null
                 || news.getTitlePic() == null || news.getNewsAbstract() == null
                 || news.getContent() == null) {
             return new Result(Constant.ERROR_CODE1, Constant.PARAM_ERROR);
@@ -63,12 +64,17 @@ public class NewsController {
 
     @RequestMapping(value = "/detail")
     public Result getContent(@RequestParam("id") Integer id) {
-        if (id == null) {
-            return new Result(Constant.ERROR_CODE1, Constant.PARAM_ERROR);
-        }
         String content = newsService.getContent(id);
         Result result = new Result(Constant.OK_CODE, Constant.OK);
         result.setData(content);
+        return result;
+    }
+
+    @RequestMapping(value = "/news-by-me")
+    public Result getNewsByCreator(@RequestParam("name") String creatorName) {
+        List<News> news = newsService.getNewsByCreator(creatorName);
+        Result result = new Result(Constant.OK_CODE, Constant.OK);
+        result.setData(news);
         return result;
     }
 
