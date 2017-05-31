@@ -100,6 +100,7 @@ public class HouseService {
         }
     }
 
+
     private void saveSolrIndex(House house) {
         SolrInputDocument document = new SolrInputDocument();
         document.addField("id", house.getHouseId());
@@ -144,6 +145,7 @@ public class HouseService {
         }
         return Collections.emptyList();
     }
+
 
     private SolrQuery getQuery(HouseCondition condition) {
         String searchKey = getSearchKey(condition);
