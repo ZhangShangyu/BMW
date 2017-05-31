@@ -2,6 +2,7 @@ package com.zsy.bmw.service;
 
 import com.github.pagehelper.PageHelper;
 import com.zsy.bmw.dao.HouseMapper;
+import com.zsy.bmw.model.BrowseCount;
 import com.zsy.bmw.model.House;
 import com.zsy.bmw.model.HouseCondition;
 import org.apache.solr.client.solrj.SolrClient;
@@ -69,17 +70,10 @@ public class HouseService {
     public House getHouseDetail(Integer id) {
         House house = houseMapper.getHouseById(id);
         house.setImgUrls(houseMapper.getHouseImgs(id));
-        List<Integer> tagIds = houseMapper.getHouseTagIds(id);
-        if (tagIds.size() != 0) {
-            house.setTagNames(houseMapper.getTagNames(tagIds));
-        } else {
-            house.setTagNames(Collections.emptyList());
-        }
         return house;
     }
 
     public List<House> getHouseByCondition(HouseCondition condition) {
-        // TODO  无搜索条件的时候推送什么？
         handleCondition(condition);
         List<Integer> houseIds = getHouseIdBySolr(condition);
         List<House> houses = new ArrayList<>();
@@ -95,6 +89,15 @@ public class HouseService {
             houses.add(house);
         }
         return houses;
+    }
+
+    public void addBrowseCount(BrowseCount browseCount) {
+        Integer count = houseMapper.getBrowseCount(browseCount);
+        if (count == null) {
+            houseMapper.insertBrowseCount(browseCount);
+        } else {
+            houseMapper.updateBrowseCount(browseCount);
+        }
     }
 
     private void saveSolrIndex(House house) {
@@ -240,7 +243,7 @@ public class HouseService {
             condition.setMinArea(Integer.parseInt(minArea));
             condition.setMaxArea(Integer.parseInt(maxArea));
         }
-        condition.setRows(2);
+        //condition.setRows(2);
     }
 
     private void executePagination(House house) {

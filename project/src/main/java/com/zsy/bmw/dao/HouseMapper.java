@@ -1,5 +1,6 @@
 package com.zsy.bmw.dao;
 
+import com.zsy.bmw.model.BrowseCount;
 import com.zsy.bmw.model.House;
 import com.zsy.bmw.model.HouseCondition;
 import org.apache.ibatis.annotations.Param;
@@ -37,4 +38,10 @@ public interface HouseMapper {
     String getTagName(@Param("id") Integer id);
 
     List<House> getHouseByCreator(@Param("creatorName") String creatorName);
+
+    Integer getBrowseCount(BrowseCount browseCount);
+
+    void insertBrowseCount(BrowseCount browseCount);
+
+    void updateBrowseCount(BrowseCount browseCount);
 }

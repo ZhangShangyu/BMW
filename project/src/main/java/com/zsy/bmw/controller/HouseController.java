@@ -1,5 +1,6 @@
 package com.zsy.bmw.controller;
 
+import com.zsy.bmw.model.BrowseCount;
 import com.zsy.bmw.model.House;
 import com.zsy.bmw.model.HouseCondition;
 import com.zsy.bmw.service.HouseService;
@@ -38,10 +39,7 @@ public class HouseController {
     }
 
     @RequestMapping("/detail")
-    public Result getHouseBrief(@RequestParam("id") Integer houseId) {
-        if (houseId == null) {
-            return new Result(Constant.ERROR_CODE1, Constant.PARAM_ERROR);
-        }
+    public Result getHouseDetail(@RequestParam("id") Integer houseId) {
         House house = houseService.getHouseDetail(houseId);
         Result result = new Result(Constant.OK_CODE, Constant.OK);
         result.setData(house);
@@ -64,4 +62,13 @@ public class HouseController {
         return result;
     }
 
+    @RequestMapping("addcount")
+    public Result addBrowseCount(@RequestParam("userId") Integer userId,
+                                 @RequestParam("houseId") Integer houseId) {
+        BrowseCount browseCount = new BrowseCount();
+        browseCount.setUserId(userId);
+        browseCount.setHouseId(houseId);
+        houseService.addBrowseCount(browseCount);
+        return new Result(Constant.OK_CODE, Constant.OK);
+    }
 }
