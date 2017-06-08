@@ -13,14 +13,15 @@
         <result column="abstract" property="newsAbstract" jdbcType="VARCHAR"/>
         <result column="title_pic" property="titlePic" jdbcType="VARCHAR"/>
         <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="recommend" property="recommend" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="base_column_list">
-        id, creator_name, create_time, title, abstract, title_pic
+        id, creator_name, create_time, title, abstract, title_pic, recommend
     </sql>
 
     <sql id="insert_column_list">
-        creator_name, title, abstract, title_pic
+        creator_name, title, abstract, title_pic, recommend
     </sql>
 
     <select id="selectAll" resultMap="BaseResultMap">
@@ -28,6 +29,15 @@
         <include refid="base_column_list"/>
         from news
         order by id desc
+    </select>
+
+    <select id="selectRecommend" resultMap="BaseResultMap">
+        select
+        id, title
+        from news
+        where recommend = 1
+        order by id desc
+        limit 10
     </select>
 
     <select id="getContent" parameterType="java.lang.Integer" resultType="java.lang.String">
@@ -48,7 +58,7 @@
         insert into news
         (<include refid="insert_column_list"/>)
         values
-        (#{creatorName}, #{title}, #{newsAbstract}, #{titlePic})
+        (#{creatorName}, #{title}, #{newsAbstract}, #{titlePic}, #{recommend})
     </insert>
 
     <insert id="insertContent" parameterType="News">

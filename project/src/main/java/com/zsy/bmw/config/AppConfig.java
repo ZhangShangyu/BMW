@@ -10,9 +10,11 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
+import redis.clients.jedis.JedisPoolConfig;
 
 import javax.sql.DataSource;
 
@@ -65,8 +67,26 @@ public class AppConfig implements TransactionManagementConfigurer, EnvironmentAw
     }
 
     @Bean
-    public SolrClient solrClient() {
+    public SolrClient solrRentClient() {
         return new HttpSolrClient(env.getProperty("solr.core.bmw"));
+    }
+
+    @Bean
+    public SolrClient solrSaleClient() {
+        return new HttpSolrClient(env.getProperty("solr.core.bmw.sale"));
+    }
+
+    @Bean
+    public JedisConnectionFactory redisConnectionFactory() {
+        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
+        jedisConnectionFactory.setHostName(env.getProperty("redis.host").trim());
+        jedisConnectionFactory.setPort(Integer.parseInt(env.getProperty("redis.port").trim()));
+        jedisConnectionFactory.setPassword(env.getProperty("redis.password").trim());
+        jedisConnectionFactory.setDatabase(Integer.parseInt(env.getProperty("redis.database").trim()));
+        jedisConnectionFactory.setUsePool(true);
+        jedisConnectionFactory.setPoolConfig(jedisPoolConfig);
+        return jedisConnectionFactory;
     }
 
 }

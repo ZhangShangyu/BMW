@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Created by MAC on 26/04/2017.
+ * Created by ZSY on 26/04/2017.
  */
 
 @Service
@@ -25,7 +25,7 @@ public class UserService {
 
     public void insertUser(User user) {
         if (user.getRoleId() == null) {
-            user.setRoleId(1);
+            user.setRoleId(0);
         }
         userMapper.insert(user);
     }

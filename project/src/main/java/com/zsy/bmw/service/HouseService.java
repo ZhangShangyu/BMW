@@ -13,6 +13,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -30,12 +31,48 @@ public class HouseService {
     private HouseMapper houseMapper;
 
     @Autowired
-    private SolrClient solrClient;
+    private SolrClient solrRentClient;
+
+    @Autowired
+    private SolrClient solrSaleClient;
+
+    @Autowired
+    private RedisService redisService;
 
     public List<House> getHouseByCreator(String creatorName) {
         return houseMapper.getHouseByCreator(creatorName);
     }
 
+    @Cacheable(value = "similarHouses", keyGenerator = "keyGenerator")
+    public List<House> getSimilarHouses(Integer houseId) {
+        List<House> simHouses = new ArrayList<>();
+        List<Integer> simHouseIds = houseMapper.getSimilarHouseIds(houseId);
+        for (Integer id : simHouseIds) {
+            House simHouse = houseMapper.getHouseBriefById(id);
+            simHouse.setHeadImg(houseMapper.getHeadImg(id));
+            simHouses.add(simHouse);
+        }
+        return simHouses;
+    }
+
+    @Cacheable(value = "rcmdHouses", keyGenerator = "keyGenerator")
+    public List<House> getRecommendHouses(Integer userId, Integer type) {
+        if (userId == 0) {
+            return houseMapper.getRcmdHouseBySys(type);
+        }
+        List<Integer> rcmdHouseIds = houseMapper.getRcmdHouseIdsByUser(userId, type);
+        if (rcmdHouseIds.size() == 0) {
+            return houseMapper.getRcmdHouseBySys(type);
+        }
+        List<House> rcmdHouses = new ArrayList<>();
+        for (Integer houseId : rcmdHouseIds) {
+            House rcmdHouse = houseMapper.getHouseBriefById(houseId);
+            rcmdHouses.add(rcmdHouse);
+        }
+        return rcmdHouses;
+    }
+
+    @Cacheable(value = "topHouse", keyGenerator = "keyGenerator")
     public List<House> getTopHouse() {
         House _house = new House();
         _house.setRows(18);
@@ -53,23 +90,15 @@ public class HouseService {
         for (String imgUrl : house.getImgUrls()) {
             houseMapper.insertHouseImg(house.getHouseId(), imgUrl);
         }
-        // TODO 考虑是否还需要TAG
-        Integer id = house.getHouseId();
-        houseMapper.insertHouseTag(id, house.getRegionTag());
-        houseMapper.insertHouseTag(id, house.getTypeTag());
-        houseMapper.insertHouseTag(id, house.getDecTag());
-        if (house.getRouteTag() != 0) {
-            houseMapper.insertHouseTag(id, house.getRouteTag());
-        }
-        if (house.getStationTag() != 0) {
-            houseMapper.insertHouseTag(id, house.getStationTag());
-        }
         saveSolrIndex(house);
+        redisService.remove("topHouse");
     }
 
     public House getHouseDetail(Integer id) {
         House house = houseMapper.getHouseById(id);
-        house.setImgUrls(houseMapper.getHouseImgs(id));
+        if (house != null) {
+            house.setImgUrls(houseMapper.getHouseImgs(id));
+        }
         return house;
     }
 
@@ -78,14 +107,19 @@ public class HouseService {
         List<Integer> houseIds = getHouseIdBySolr(condition);
         List<House> houses = new ArrayList<>();
         for (Integer id : houseIds) {
-            House house = houseMapper.getHouseBriefById(id);
+            House house = houseMapper.getHouseById(id);
             house.setHeadImg(houseMapper.getHeadImg(id));
-            List<Integer> tagIds = houseMapper.getHouseTagIds(id);
-            if (tagIds.size() != 0) {
-                house.setTagNames(houseMapper.getTagNames(tagIds));
-            } else {
-                house.setTagNames(Collections.emptyList());
+            List<String> tags = new ArrayList<>();
+            tags.add(house.getRegion());
+            tags.add(house.getType());
+            tags.add(house.getDec());
+            if (!"".equals(house.getRoute())) {
+                tags.add(house.getRoute());
             }
+            if (!"".equals(house.getStation())) {
+                tags.add(house.getStation());
+            }
+            house.setTagNames(tags);
             houses.add(house);
         }
         return houses;
@@ -100,7 +134,6 @@ public class HouseService {
         }
     }
 
-
     private void saveSolrIndex(House house) {
         SolrInputDocument document = new SolrInputDocument();
         document.addField("id", house.getHouseId());
@@ -108,15 +141,16 @@ public class HouseService {
         document.addField("area", house.getArea());
         document.addField("price", house.getPrice());
         document.addField("des", house.getDes());
-        document.addField("region", houseMapper.getTagName(house.getRegionTag()));
-        document.addField("type", houseMapper.getTagName(house.getTypeTag()));
-        document.addField("dec", houseMapper.getTagName(house.getDecTag()));
-        if (house.getRouteTag() != 0) {
-            document.addField("route", houseMapper.getTagName(house.getRouteTag()));
+        document.addField("region", house.getRegion());
+        document.addField("type", house.getType());
+        document.addField("dec", house.getDec());
+        if (!"".equals(house.getRoute())) {
+            document.addField("route", house.getRoute());
         }
-        if (house.getStationTag() != 0) {
-            document.addField("station", houseMapper.getTagName(house.getStationTag()));
+        if (!"".equals(house.getStation())) {
+            document.addField("station", house.getStation());
         }
+        SolrClient solrClient = house.getSaleType() == 0 ? solrRentClient : solrSaleClient;
         try {
             solrClient.add(document);
             solrClient.commit();
@@ -131,7 +165,12 @@ public class HouseService {
         SolrQuery solrQuery = getQuery(condition);
         try {
             List<Integer> result = new ArrayList<>();
-            QueryResponse resp = solrClient.query(solrQuery);
+            QueryResponse resp;
+            if (condition.getSaleType() == 0) {
+                resp = solrRentClient.query(solrQuery);
+            } else {
+                resp = solrSaleClient.query(solrQuery);
+            }
             SolrDocumentList list = resp.getResults();
             for (SolrDocument solrDocument : list) {
                 result.add(Integer.parseInt((String) solrDocument.get("id")));
@@ -245,7 +284,6 @@ public class HouseService {
             condition.setMinArea(Integer.parseInt(minArea));
             condition.setMaxArea(Integer.parseInt(maxArea));
         }
-        //condition.setRows(2);
     }
 
     private void executePagination(House house) {
@@ -254,4 +292,14 @@ public class HouseService {
         }
     }
 
+    public List<House> getBrowsedHouses(Integer userId, Integer type) {
+        List<House> houses = houseMapper.getBrowsedHouses(userId, type);
+        List<House> result = new ArrayList<>();
+        for (House house : houses) {
+            House _house = houseMapper.getHouseBriefById(house.getHouseId());
+            _house.setCount(house.getCount());
+            result.add(_house);
+        }
+        return result;
+    }
 }

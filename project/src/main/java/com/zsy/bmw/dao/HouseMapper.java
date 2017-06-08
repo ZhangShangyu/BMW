@@ -4,6 +4,7 @@ import com.zsy.bmw.model.BrowseCount;
 import com.zsy.bmw.model.House;
 import com.zsy.bmw.model.HouseCondition;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 
@@ -21,21 +22,15 @@ public interface HouseMapper {
 
     void insertHouseImg(@Param("houseId") Integer houseId, @Param("imgUrl") String imgUrl);
 
-    void insertHouseTag(@Param("houseId") Integer houseId, @Param("tagId") Integer tag);
-
+    @Cacheable(value = "house-detail", keyGenerator = "keyGenerator")
     House getHouseById(@Param("houseId") Integer houseId);
 
     House getHouseBriefById(@Param("houseId") Integer houseId);
 
+    @Cacheable(value = "house-img", keyGenerator = "keyGenerator")
     List<String> getHouseImgs(@Param("houseId") Integer houseId);
 
-    List<Integer> getHouseTagIds(@Param("houseId") Integer houseId);
-
-    List<String> getTagNames(@Param("tagIds") List<Integer> tagIds);
-
     List<House> getHouseIdsByCondition(HouseCondition condition);
-
-    String getTagName(@Param("id") Integer id);
 
     List<House> getHouseByCreator(@Param("creatorName") String creatorName);
 
@@ -44,4 +39,12 @@ public interface HouseMapper {
     void insertBrowseCount(BrowseCount browseCount);
 
     void updateBrowseCount(BrowseCount browseCount);
+
+    List<Integer> getSimilarHouseIds(@Param("houseId") Integer houseId);
+
+    List<Integer> getRcmdHouseIdsByUser(@Param("userId") Integer userId, @Param("type") Integer type);
+
+    List<House> getRcmdHouseBySys(@Param("type") Integer type);
+
+    List<House> getBrowsedHouses(@Param("userId") Integer userId, @Param("type") Integer type);
 }

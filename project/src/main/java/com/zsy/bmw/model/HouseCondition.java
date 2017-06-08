@@ -26,6 +26,8 @@ public class HouseCondition extends BaseEntity {
     private String routeLabel;
     private String decLabel;
 
+    private Integer saleType;
+
     public String getRegionLabel() {
         return regionLabel;
     }
@@ -162,4 +164,11 @@ public class HouseCondition extends BaseEntity {
         this.maxArea = maxArea;
     }
 
+    public Integer getSaleType() {
+        return saleType;
+    }
+
+    public void setSaleType(Integer saleType) {
+        this.saleType = saleType;
+    }
 }

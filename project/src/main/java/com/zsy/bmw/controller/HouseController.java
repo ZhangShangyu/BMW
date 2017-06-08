@@ -63,12 +63,34 @@ public class HouseController {
     }
 
     @RequestMapping("addcount")
-    public Result addBrowseCount(@RequestParam("userId") Integer userId,
-                                 @RequestParam("houseId") Integer houseId) {
-        BrowseCount browseCount = new BrowseCount();
-        browseCount.setUserId(userId);
-        browseCount.setHouseId(houseId);
+    public Result addBrowseCount(BrowseCount browseCount) {
         houseService.addBrowseCount(browseCount);
         return new Result(Constant.OK_CODE, Constant.OK);
+    }
+
+    @RequestMapping("similar")
+    public Result getSimilarHouses(@RequestParam("houseId") Integer houseId) {
+        List<House> simHouses = houseService.getSimilarHouses(houseId);
+        Result result = new Result(Constant.OK_CODE, Constant.OK);
+        result.setData(simHouses);
+        return result;
+    }
+
+    @RequestMapping("recommend")
+    public Result getRecommend(@RequestParam("userId") Integer userId,
+                               @RequestParam("type") Integer type) {
+        List<House> rcmdHouses = houseService.getRecommendHouses(userId, type);
+        Result result = new Result(Constant.OK_CODE, Constant.OK);
+        result.setData(rcmdHouses);
+        return result;
+    }
+
+    @RequestMapping("browsed")
+    public Result getBrowsedHouses(@RequestParam("userId") Integer userId,
+                                   @RequestParam("type") Integer type) {
+        List<House> browsedHouses = houseService.getBrowsedHouses(userId, type);
+        Result result = new Result(Constant.OK_CODE, Constant.OK);
+        result.setData(browsedHouses);
+        return result;
     }
 }

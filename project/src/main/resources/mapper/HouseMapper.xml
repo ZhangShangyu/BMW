@@ -19,13 +19,15 @@
         <result column="phone" property="phone" jdbcType="VARCHAR"/>
         <result column="contact" property="contact" jdbcType="VARCHAR"/>
         <result column="des" property="des" jdbcType="VARCHAR"/>
-        <result column="region_tag" property="regionTag" jdbcType="INTEGER"/>
-        <result column="type_tag" property="typeTag" jdbcType="INTEGER"/>
-        <result column="dec_tag" property="decTag" jdbcType="INTEGER"/>
-        <result column="route_tag" property="routeTag" jdbcType="INTEGER"/>
-        <result column="station_tag" property="stationTag" jdbcType="INTEGER"/>
+        <result column="region" property="region" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="VARCHAR"/>
+        <result column="dec" property="dec" jdbcType="VARCHAR"/>
+        <result column="route" property="route" jdbcType="VARCHAR"/>
+        <result column="station" property="station" jdbcType="VARCHAR"/>
+        <result column="sale_type" property="saleType" jdbcType="INTEGER"/>
+        <result column="recommend" property="recommend" jdbcType="INTEGER"/>
+        <result column="count" property="count" jdbcType="INTEGER"/>
     </resultMap>
-
 
     <select id="getTopHouses" resultMap="BaseResultMap">
         select
@@ -34,6 +36,42 @@
         order by house_id desc
     </select>
 
+    <select id="getRcmdHouseBySys" resultMap="BaseResultMap">
+      select
+      house_id, name, region, `dec`, type
+      from house
+      where recommend = 1
+      and sale_type = #{type}
+      order by house_id desc
+      limit 7
+    </select>
+
+    <select id="getRcmdHouseIdsByUser" resultType="java.lang.Integer">
+        select
+        house_id
+        from recommend_house
+        where user_id = #{userId}
+        and type = #{type}
+        order by house_id desc
+        limit 7
+    </select>
+
+    <select id="getBrowsedHouses" resultMap="BaseResultMap">
+        select
+        house_id, count
+        from browse_count
+        where user_id = #{userId}
+        and sale_type = #{type}
+        order by count desc
+    </select>
+
+    <select id="getSimilarHouseIds" resultType="java.lang.Integer">
+        select similar_id
+        from similar_house
+        where house_id = #{houseId}
+        order by house_id desc
+        limit 3
+    </select>
 
     <select id="getHeadImg" parameterType="java.lang.Integer" resultType="java.lang.String">
         select
@@ -58,7 +96,7 @@
     </select>
 
     <select id="getHouseBriefById" resultMap="BaseResultMap">
-        SELECT house_id, name, price, position, area, des
+        SELECT house_id, name, region, `dec`, type
         from house
         where house_id = #{houseId}
         limit 1
@@ -68,21 +106,6 @@
         SELECT img
         from house_imgs
         where house_id = #{houseId}
-    </select>
-
-    <select id="getHouseTagIds" resultType="java.lang.Integer">
-        SELECT tag_id
-        from house_tags
-        where house_id = #{houseId}
-    </select>
-
-    <select id="getTagNames" resultType="java.lang.String">
-        SELECT name
-        from tag
-        where tag_id IN
-        <foreach item="id" collection="tagIds" open="(" separator="," close=")">
-            #{id}
-        </foreach>
     </select>
 
     <select id="getHouseIdsByCondition" parameterType="HouseCondition" resultMap="BaseResultMap">
@@ -95,48 +118,36 @@
             and area &lt;= #{maxArea} and area &gt;= #{minArea}
         </if>
         <if test="region != null">
-            and region_tag = #{region}
+            and region = #{region}
         </if>
         <if test="type != null">
-            and type_tag = #{type}
+            and type = #{type}
         </if>
         <if test="dec != null">
-            and dec_tag = #{dec}
+            and "dec" = #{dec}
         </if>
         <if test="route != null">
-            and route_tag = #{route}
+            and route = #{route}
         </if>
         <if test="station != null">
-            and station_tag = #{station}
+            and station = #{station}
         </if>
-    </select>
-
-    <select id="getTagName" parameterType="java.lang.Integer" resultType="java.lang.String">
-        SELECT name
-        FROM tag
-        WHERE tag_id = #{id}
     </select>
 
     <insert id="insertHouse" parameterType="House" useGeneratedKeys="true" keyProperty="houseId">
         INSERT INTO
         house(name, creator_name, price, city_id,
-        position, area, phone, contact, des,
-        region_tag, type_tag, dec_tag, route_tag, station_tag)
+        position, address, area, phone, contact, des,
+        region, type, `dec`, route, station, sale_type, recommend)
         VALUES (#{name}, #{creatorName}, #{price}, #{cityId},
-        #{position}, #{area}, #{phone}, #{contact}, #{des},
-        #{regionTag}, #{typeTag}, #{decTag}, #{routeTag}, #{stationTag})
+        #{position}, #{address}, #{area}, #{phone}, #{contact}, #{des},
+        #{region}, #{type}, #{dec}, #{route}, #{station}, #{saleType}, #{recommend})
     </insert>
 
     <insert id="insertHouseImg">
         INSERT INTO
         house_imgs(house_id, img)
         VALUES(#{houseId}, #{imgUrl})
-    </insert>
-
-    <insert id="insertHouseTag">
-        INSERT INTO
-        house_tags(house_id, tag_id)
-        VALUES(#{houseId}, #{tagId})
     </insert>
 
     <select id="getBrowseCount" resultType="java.lang.Integer">
@@ -148,8 +159,8 @@
 
     <insert id="insertBrowseCount" parameterType="BrowseCount">
         INSERT INTO
-        browse_count(user_id, house_id)
-        VALUES(#{userId}, #{houseId})
+        browse_count(user_id, house_id, sale_type)
+        VALUES(#{userId}, #{houseId}, #{saleType})
     </insert>
 
     <update id="updateBrowseCount" parameterType="BrowseCount">
@@ -158,6 +169,5 @@
         WHERE user_id = #{userId}
         AND house_id = #{houseId}
     </update>
-
 
 </mapper>

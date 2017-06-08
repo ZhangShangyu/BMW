@@ -78,4 +78,12 @@ public class NewsController {
         return result;
     }
 
+    @RequestMapping(value = "recommend")
+    public Result getRecommendNews() {
+        List<News> news = newsService.getRecommendNews();
+        Result result = new Result(Constant.OK_CODE, Constant.OK);
+        result.setData(news);
+        return result;
+    }
+
 }

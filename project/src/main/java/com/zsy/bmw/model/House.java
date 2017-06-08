@@ -7,7 +7,7 @@ import java.util.List;
  */
 
 public class House extends BaseEntity {
-    private Integer HouseId;
+    private Integer houseId;
     private String name;
     private String creatorName;
     private String createTime;
@@ -28,50 +28,63 @@ public class House extends BaseEntity {
 
     private List<String> tagNames;
 
-    private Integer regionTag;
-    private Integer typeTag;
-    private Integer decTag;
-    private Integer routeTag;
-    private Integer stationTag;
+    private String region;
+    private String type;
+    private String dec;
+    private String route;
+    private String station;
 
-    public Integer getRegionTag() {
-        return regionTag;
+    private Integer saleType = 0;
+    private Integer recommend;
+
+    private Integer count;
+
+    public String getRegion() {
+        return region;
     }
 
-    public void setRegionTag(Integer regionTag) {
-        this.regionTag = regionTag;
+    public void setRegion(String region) {
+        this.region = region;
     }
 
-    public Integer getTypeTag() {
-        return typeTag;
+    public String getType() {
+        return type;
     }
 
-    public void setTypeTag(Integer typeTag) {
-        this.typeTag = typeTag;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public Integer getDecTag() {
-        return decTag;
+    public String getDec() {
+        return dec;
     }
 
-    public void setDecTag(Integer decTag) {
-        this.decTag = decTag;
+    public void setDec(String dec) {
+        this.dec = dec;
     }
 
-    public Integer getRouteTag() {
-        return routeTag;
+    public String getRoute() {
+        return route;
     }
 
-    public void setRouteTag(Integer routeTag) {
-        this.routeTag = routeTag;
+    public void setRoute(String route) {
+        this.route = route;
     }
 
-    public Integer getStationTag() {
-        return stationTag;
+    public String getStation() {
+        return station;
     }
 
-    public void setStationTag(Integer stationTag) {
-        this.stationTag = stationTag;
+    public void setStation(String station) {
+        this.station = station;
+    }
+
+    public Integer getSaleType() {
+        return saleType;
+    }
+
+    public void setSaleType(Integer saleType) {
+        this.saleType = saleType;
     }
 
     public List<String> getImgUrls() {
@@ -123,11 +136,11 @@ public class House extends BaseEntity {
     }
 
     public Integer getHouseId() {
-        return HouseId;
+        return houseId;
     }
 
     public void setHouseId(Integer houseId) {
-        HouseId = houseId;
+        this.houseId = houseId;
     }
 
     public String getCreatorName() {
@@ -208,5 +221,21 @@ public class House extends BaseEntity {
 
     public void setTagNames(List<String> tagNames) {
         this.tagNames = tagNames;
+    }
+
+    public Integer getRecommend() {
+        return recommend;
+    }
+
+    public void setRecommend(Integer recommend) {
+        this.recommend = recommend;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
     }
 }

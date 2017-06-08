@@ -9,21 +9,34 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Created by MAC on 27/04/2017.
+ * Created by ZSY on 27/04/2017.
  */
 @Service
 public class NewsService {
     @Autowired
     private NewsMapper newsMapper;
 
+    @Autowired
+    private RedisService redisService;
+
     public List<News> getNewsByCreator(String creatorName) {
         return newsMapper.getNewsByCreator(creatorName);
     }
 
+    public List<News> getRecommendNews() {
+        return newsMapper.selectRecommend();
+    }
+
     public List<News> getNewsByPage(News news) {
+        String cacheKey = "newsPage" + news.getPageNum();
+        if (redisService.exists(cacheKey)) {
+            return (List<News>) redisService.get(cacheKey);
+        }
         news.setRows(5);
         executePagination(news);
-        return newsMapper.selectAll();
+        List<News> newsList = newsMapper.selectAll();
+        redisService.set(cacheKey, newsList);
+        return newsList;
     }
 
     public void insertNews(News news) {

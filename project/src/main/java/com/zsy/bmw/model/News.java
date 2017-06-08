@@ -11,6 +11,7 @@ public class News extends BaseEntity {
     private String newsAbstract;
     private String titlePic;
     private String content;
+    private Integer recommend;
 
     public Integer getId() {
         return id;
@@ -66,5 +67,13 @@ public class News extends BaseEntity {
 
     public void setCreatorName(String creatorName) {
         this.creatorName = creatorName;
+    }
+
+    public Integer getRecommend() {
+        return recommend;
+    }
+
+    public void setRecommend(Integer recommend) {
+        this.recommend = recommend;
     }
 }

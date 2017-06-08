@@ -7,6 +7,7 @@ public class BrowseCount {
     private Integer userId;
     private Integer houseId;
     private Integer count;
+    private Integer saleType;
 
     public Integer getUserId() {
         return userId;
@@ -30,5 +31,13 @@ public class BrowseCount {
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    public Integer getSaleType() {
+        return saleType;
+    }
+
+    public void setSaleType(Integer saleType) {
+        this.saleType = saleType;
     }
 }

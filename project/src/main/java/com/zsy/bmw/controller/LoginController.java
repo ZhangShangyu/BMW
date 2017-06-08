@@ -40,7 +40,7 @@ public class LoginController {
             return new Result(Constant.ERROR_CODE2, Constant.LOGIN_ERROR);
         }
         Result result = new Result(Constant.OK_CODE, Constant.OK);
-        result.setData(_user.getId());
+        result.setData(_user);
         return result;
     }
 }
