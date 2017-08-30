@@ -64,9 +64,9 @@ public class NewsController {
 
     @RequestMapping(value = "/detail")
     public Result getContent(@RequestParam("id") Integer id) {
-        String content = newsService.getContent(id);
+        News news = newsService.getContent(id);
         Result result = new Result(Constant.OK_CODE, Constant.OK);
-        result.setData(content);
+        result.setData(news);
         return result;
     }
 

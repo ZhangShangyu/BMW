@@ -24,4 +24,8 @@ public interface NewsMapper {
 
     @Cacheable(value = "newsRecommend", keyGenerator = "keyGenerator")
     List<News> selectRecommend();
+
+    News getNewsById(@Param("id") Integer id);
 }
+
+

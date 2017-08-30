@@ -44,8 +44,12 @@ public class NewsService {
         newsMapper.insertContent(news);
     }
 
-    public String getContent(Integer id) {
-        return newsMapper.getContent(id);
+    public News getContent(Integer id) {
+        News news = newsMapper.getNewsById(id);
+        if (news != null) {
+            news.setContent(newsMapper.getContent(id));
+        }
+        return news;
     }
 
     private void executePagination(News news) {

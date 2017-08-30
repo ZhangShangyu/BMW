@@ -40,6 +40,13 @@
         limit 10
     </select>
 
+    <select id="getNewsById" resultMap="BaseResultMap">
+        select
+        <include refid="base_column_list"/>
+        from news
+        where id = #{id}
+    </select>
+
     <select id="getContent" parameterType="java.lang.Integer" resultType="java.lang.String">
         SELECT
         content

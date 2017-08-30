@@ -75,7 +75,7 @@ public class HouseService {
     @Cacheable(value = "topHouse", keyGenerator = "keyGenerator")
     public List<House> getTopHouse() {
         House _house = new House();
-        _house.setRows(18);
+        _house.setRows(12);
         executePagination(_house);
         List<House> houses = houseMapper.getTopHouses();
         for (House house : houses) {
